@@ -261,8 +261,19 @@
         var spanFinal = document.createElement('span'); spanFinal.textContent = finalText; mySpeechBox.appendChild(spanFinal);
         if(interim){ var spanInter = document.createElement('span'); spanInter.style.opacity='0.6'; spanInter.textContent=' '+interim; mySpeechBox.appendChild(spanInter); }
       };
-      rec.onerror = function(){ stopAll(); };
-      rec.onend = function(){ stopAll(); };
+      rec.onerror = function(ev){
+  // Don't kill recording when STT has an issue.
+  console.warn('SpeechRecognition error:', ev && ev.error);
+  try{ rec.stop(); }catch(e){}
+};
+rec.onend = function(){
+  // On mobile Safari, STT often ends after a short while.
+  // Keep the MediaRecorder running; optionally restart STT if we are still listening.
+  if(listening){
+    try{ rec.start(); }catch(e){ /* iOS may block auto-restart */ }
+  }
+};
+
       rec.start();
       return true;
     }
@@ -306,7 +317,7 @@
         const res = await startRecording();
         recOK = !!res;
       } catch(e){ recOK = false; }
-      if(!sttOK){ alert('Không bật được nhận dạng giọng nói.'); stopAll(); }
+      if(!sttOK){ console.warn('STT not available; continuing with recording only.'); }
       // If recording failed, we still keep STT running
     }
 
@@ -353,7 +364,7 @@ async function startRecording(){
     return false;
   }
   try {
-    const constraints = { audio: true }; // simpler for iOS
+    const constraints = { audio: { echoCancellation: true, noiseSuppression: true } }; // improved stability on mobile
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     mediaStream = stream;
     chunks = [];
@@ -363,10 +374,18 @@ async function startRecording(){
       return false;
     }
     let mime = '';
-    if (MediaRecorder.isTypeSupported('audio/webm')) { mime = 'audio/webm'; }
-    else if (MediaRecorder.isTypeSupported('audio/mp4')) { mime = 'audio/mp4'; }
-    else if (MediaRecorder.isTypeSupported('audio/mpeg')) { mime = 'audio/mpeg'; }
-    if (mime) options.mimeType = mime;
+// Prefer MP4 on iOS Safari; WebM Opus elsewhere
+if (isIOS() && isSafari() && MediaRecorder.isTypeSupported('audio/mp4')) {
+  mime = 'audio/mp4';
+} else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+  mime = 'audio/webm;codecs=opus';
+} else if (MediaRecorder.isTypeSupported('audio/webm')) {
+  mime = 'audio/webm';
+} else if (MediaRecorder.isTypeSupported('audio/mpeg')) {
+  mime = 'audio/mpeg';
+}
+if (mime) options.mimeType = mime;
+
     mediaRec = new MediaRecorder(stream, options);
     mediaRec.ondataavailable = function(e){ if(e.data && e.data.size>0) chunks.push(e.data); };
     mediaRec.onstop = function(){
@@ -376,7 +395,7 @@ async function startRecording(){
       addRecordingToList(lastAudioURL, mySpeechBox.getAttribute('data-final') || '');
       playLastBtn.disabled = !lastAudioURL;
     };
-    mediaRec.start(100);
+    if (isIOS() && isSafari()) { mediaRec.start(); } else { mediaRec.start(1000); }
     return true;
   } catch(err){
     console.warn('getUserMedia failed', err);
