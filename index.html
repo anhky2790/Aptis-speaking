@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>English Speaking Coach — Q&A + Recording</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background:#f7f7fb; color:#111; }
+  h1 { margin: 0 0 10px; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:14px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .controls { margin: 10px 0; }
+  label { font-size: 13px; color:#555; margin-right:6px; }
+  select, input[type="number"] { padding:8px 10px; border:1px solid #e5e7eb; border-radius:10px; }
+  button { padding:10px 14px; border-radius:12px; border:1px solid #111; background:#111; color:#fff; cursor:pointer; font-weight:600; }
+  button.secondary { background:#fff; color:#111; border-color:#d1d5db; }
+  button.ghost { background:transparent; color:#374151; border-color:transparent; }
+  button.green { background:#16a34a; border-color:#16a34a; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .grid { display:grid; gap:14px; }
+  @media(min-width: 1080px){ .grid-2 { grid-template-columns: 1.8fr 1fr; } }
+  .target { font-size:18px; line-height:1.6; }
+  .box { min-height:80px; border:1px solid #e5e7eb; border-radius:12px; padding:10px; background:#fff; }
+  .muted { color:#6b7280; font-size:12px; }
+  .timer { font-weight:800; font-size:24px; }
+  .subtitle { font-weight:600; margin:6px 0; font-size:14px; color:#374151; }
+  .rec-list { max-height: 45vh; overflow:auto; }
+  .chip { padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; font-size:12px; }
+
+@media (max-width: 768px) {
+  body { padding: 10px; font-size: 16px; }
+  .row { flex-direction: column; align-items: stretch; }
+  select, input[type="number"], button { width: 100% !important; margin-top: 6px; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+  #qaSel { min-width: unset !important; }
+  #voiceSel { min-width: unset !important; }
+}
+
+</style>
+</head>
+<body>
+  <h1>English Speaking Coach</h1>
+  <div class="muted">Bản độc lập – Q&A, đếm ngược, ghi âm & phát lại, transcript trực tiếp</div>
+
+  <div class="grid grid-2" style="margin-top:12px;">
+    <section>
+      <div class="card">
+        <div class="row controls">
+          <label>Chủ đề</label>
+          <select id="topicSel"></select>
+
+          <label>Câu hỏi</label>
+          <select id="qaSel" style="min-width:320px;"></select>
+
+          <label>Thời gian (giây)</label>
+          <input id="secsInput" type="number" min="5" max="180" value="30" style="width:80px;" />
+
+          <div style="margin-left:auto;" class="timer" id="timer">00:30</div>
+        </div>
+
+        <div class="subtitle">Câu hỏi</div>
+        <div class="target box" id="questionBox">...</div>
+        <div class="row" style="margin-top:8px;">
+          <button id="qListenBtn" class="secondary">🔊 Play Question</button>
+        </div>
+
+        <div class="subtitle">Gợi ý câu trả lời</div>
+        <div class="target box" id="answerBox">...</div>
+        <div class="row" style="margin-top:8px;">
+          <button id="aListenBtn" class="secondary">🔊 Play Suggested Answer</button>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="startBtn" class="green">🎙️ Start</button>
+          <button id="stopBtn" class="secondary" disabled>⏹ Stop</button>
+          <button id="clearBtn" class="ghost">🧹 Clear transcript</button>
+          <button id="playLastBtn" class="secondary" disabled>⏯️ Play last recording</button>
+        </div>
+        <div class="muted" style="margin-top:6px;">Tip: Bạn trả lời theo ý bạn, không cần đọc theo gợi ý.</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div class="subtitle">Tôi nói (ghi theo thời gian thực)</div>
+        <div class="box" id="mySpeechBox"><span class="muted">(nội dung bạn nói sẽ hiện ở đây)</span></div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <div class="subtitle">Cài đặt giọng</div>
+        <div class="row" style="margin-top:8px;">
+          <label>Voice</label>
+          <select id="voiceSel" style="min-width:260px;"></select>
+          <label>Tốc độ</label>
+          <input id="rate" type="number" step="0.1" min="0.6" max="1.4" value="1" style="width:70px;" />
+          <label>Cao độ</label>
+          <input id="pitch" type="number" step="0.1" min="0.7" max="1.3" value="1" style="width:70px;" />
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div class="subtitle">Bản ghi gần đây</div>
+        <div class="muted">Lưu cục bộ trong phiên này. Bạn có thể tải về.</div>
+        <div id="recList" class="rec-list" style="margin-top:8px;"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // ----- Dataset: Topics with Q&A -----
+    const qaData = {
+      'Daily Life': [
+        { q: 'What do you do in your free time?', a: 'In my free time, I enjoy reading novels, going for a run in the park, and sometimes cooking new recipes.' },
+        { q: 'How do you usually start your day?', a: 'I usually start my day with a glass of water, a quick stretch, and then I check my schedule for the day.' },
+        { q: 'Tell me about your weekend.', a: 'My weekend was relaxing. I met a friend for coffee, did some house chores, and watched a movie at night.' }
+      ],
+      'Travel': [
+        { q: 'How do I get to the airport from here?', a: 'You can take the subway line 2 directly to the airport station, or book a taxi if you have heavy luggage.' },
+        { q: 'Do you have any recommendations for local food?', a: 'You should try the street noodles and the grilled pork. They are famous around here and quite affordable.' },
+        { q: 'Could you help me find a good hotel?', a: 'Sure. What is your budget? I can recommend a few hotels near the city center with good reviews.' }
+      ],
+      'Work': [
+        { q: 'Can we schedule a meeting for tomorrow?', a: 'Yes, I’m available in the morning. How about 10 a.m.? I’ll send a calendar invite.' },
+        { q: 'Could you update me on the project status?', a: 'We’re on track. The design is finalized, development is halfway done, and testing starts next week.' },
+        { q: 'How do you handle tight deadlines?', a: 'I break tasks into smaller steps, prioritize the critical path, and communicate early if any blockers appear.' }
+      ],
+      'Interview': [
+        { q: 'Tell me about yourself.', a: 'I have three years of experience in customer support. I enjoy solving problems and improving team processes.' },
+        { q: 'Why do you want to work here?', a: 'I admire your company’s focus on user experience, and I believe my skills can help improve your product.' },
+        { q: 'What are your strengths?', a: 'I’m organized, I communicate clearly, and I learn new tools quickly.' }
+      ]
+    };
+
+    // ----- Elements -----
+    const topicSel = document.getElementById('topicSel');
+    const qaSel = document.getElementById('qaSel');
+    const questionBox = document.getElementById('questionBox');
+    const answerBox = document.getElementById('answerBox');
+    const wordsWrap = document.getElementById('wordsWrap');
+
+    const qListenBtn = document.getElementById('qListenBtn');
+    const aListenBtn = document.getElementById('aListenBtn');
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const playLastBtn = document.getElementById('playLastBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const mySpeechBox = document.getElementById('mySpeechBox');
+
+    const secsInput = document.getElementById('secsInput');
+    const timerEl = document.getElementById('timer');
+
+    const voiceSel = document.getElementById('voiceSel');
+    const rateInput = document.getElementById('rate');
+    const pitchInput = document.getElementById('pitch');
+
+    const recList = document.getElementById('recList');
+
+    // ----- TTS (question/answer/words) -----
+    function loadVoices(){
+      const list = window.speechSynthesis && window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      voiceSel.innerHTML = '';
+      list.sort(function(a,b){
+        const ae = (a.lang||'').toLowerCase().startsWith('en') ? 1 : 0;
+        const be = (b.lang||'').toLowerCase().startsWith('en') ? 1 : 0;
+        if(ae!==be) return be-ae;
+        return a.name.localeCompare(b.name);
+      }).forEach(function(v){
+        const opt = document.createElement('option');
+        opt.value = v.name; opt.textContent = v.name + ' (' + v.lang + ')';
+        voiceSel.appendChild(opt);
+      });
+      if(list.length){
+        const prefer = list.find(function(v){ return (v.lang||'').toLowerCase().startsWith('en-us'); }) || list[0];
+        voiceSel.value = prefer.name;
+      }
+    }
+    if(window.speechSynthesis){
+      loadVoices();
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    }
+
+    function speak(text){
+      if(!('speechSynthesis' in window)){ alert('Trình duyệt không hỗ trợ phát âm.'); return; }
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const list = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      const chosen = list.find(function(v){ return v.name === voiceSel.value; });
+      if(chosen) u.voice = chosen;
+      u.rate = parseFloat(rateInput.value || '1');
+      u.pitch = parseFloat(pitchInput.value || '1');
+      window.speechSynthesis.speak(u);
+    }
+
+    qListenBtn.addEventListener('click', function(){ speak(questionBox.textContent); });
+    aListenBtn.addEventListener('click', function(){ speak(answerBox.textContent); });
+
+    // ----- Populate topics/QAs -----
+    function populateTopics(){
+      Object.keys(qaData).forEach(function(t){
+        const opt = document.createElement('option'); opt.value = t; opt.textContent = t; topicSel.appendChild(opt);
+      });
+      topicSel.value = Object.keys(qaData)[0];
+      populateQAs();
+    }
+    function populateQAs(){
+      qaSel.innerHTML='';
+      const arr = qaData[topicSel.value];
+      arr.forEach(function(item, i){
+        const opt = document.createElement('option'); opt.value = String(i); opt.textContent = item.q; qaSel.appendChild(opt);
+      });
+      qaSel.value = '0';
+      updateQA();
+    }
+    function updateQA(){
+      const item = qaData[topicSel.value][Number(qaSel.value)];
+      questionBox.textContent = item.q;
+      answerBox.textContent = item.a;
+      }
+    topicSel.addEventListener('change', populateQAs);
+    qaSel.addEventListener('change', updateQA);
+
+    // ----- Timer helpers -----
+    var ticking=null, remain=0, listening=false;
+    function fmt(n){ n=Math.max(0,Math.floor(n)); var m=Math.floor(n/60), s=n%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+    function setTimerDisplay(sec){ timerEl.textContent = fmt(sec); }
+    function startCountdown(){
+      remain = parseInt(secsInput.value,10) || 30; setTimerDisplay(remain);
+      if(ticking) clearInterval(ticking);
+      ticking = setInterval(function(){
+        remain -= 1; setTimerDisplay(remain);
+        if(remain<=0){ stopAll(); }
+      }, 1000);
+    }
+    function stopCountdown(){ if(ticking){ clearInterval(ticking); ticking=null; } }
+
+    // ----- STT (SpeechRecognition) -----
+    var rec=null;
+    function startSTT(){
+      if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){
+        alert('Trình duyệt không hỗ trợ nhận dạng giọng nói. Hãy dùng Chrome/Edge.');
+        return false;
+      }
+      const Ctor = window.webkitSpeechRecognition || window.SpeechRecognition;
+      rec = new Ctor();
+      rec.lang = 'en-US';
+      rec.continuous = true;
+      rec.interimResults = true;
+      mySpeechBox.textContent = '';
+      rec.onresult = function(ev){
+        var finalText = mySpeechBox.getAttribute('data-final') || '';
+        var interim = '';
+        for(var i=ev.resultIndex; i<ev.results.length; i++){
+          var r = ev.results[i];
+          if(r.isFinal) finalText += (finalText? ' ' : '') + r[0].transcript;
+          else interim += r[0].transcript;
+        }
+        mySpeechBox.setAttribute('data-final', finalText);
+        mySpeechBox.innerHTML = '';
+        var spanFinal = document.createElement('span'); spanFinal.textContent = finalText; mySpeechBox.appendChild(spanFinal);
+        if(interim){ var spanInter = document.createElement('span'); spanInter.style.opacity='0.6'; spanInter.textContent=' '+interim; mySpeechBox.appendChild(spanInter); }
+      };
+      rec.onerror = function(){ stopAll(); };
+      rec.onend = function(){ stopAll(); };
+      rec.start();
+      return true;
+    }
+    function stopSTT(){ try{ if(rec) rec.stop(); }catch(e){} rec=null; }
+
+    // ----- Recording (MediaRecorder) -----
+    var mediaStream=null, mediaRec=null, chunks=[], lastAudioURL=null;
+    function stopRecording(){
+      try{ if(mediaRec && mediaRec.state !== 'inactive') mediaRec.stop(); } catch(e){}
+      mediaRec=null; mediaStream=null;
+    }
+
+    function addRecordingToList(url, transcript){
+      const item = document.createElement('div');
+      item.className = 'card';
+      const when = new Date().toLocaleString();
+      item.innerHTML = '<div class="row"><span class="chip">'+when+'</span><div class="muted" style="margin-left:auto">Recording</div></div>';
+      const audio = document.createElement('audio'); audio.controls = true; audio.src = url; audio.style.width = '100%'; audio.style.marginTop='8px';
+      const p = document.createElement('div'); p.style.marginTop='6px'; p.innerHTML = '<span class="muted">Transcript:</span> '+ (transcript || '<i>(empty)</i>');
+      const dl = document.createElement('a'); dl.href = url; dl.download = 'speaking-recording.webm'; dl.textContent='⬇️ Download'; dl.style.display='inline-block'; dl.style.marginTop='6px';
+      item.appendChild(audio); item.appendChild(p); item.appendChild(dl);
+      recList.prepend(item);
+    }
+
+    playLastBtn.addEventListener('click', function(){
+      if(!lastAudioURL) return;
+      const a = new Audio(lastAudioURL);
+      a.play().catch(function(){});
+    });
+
+    // ----- Start/Stop orchestration -----
+    async function startAll(){
+      if(listening) return;
+      listening = true;
+      startBtn.disabled = true; stopBtn.disabled = false;
+      setTimerDisplay(parseInt(secsInput.value,10) || 30);
+      startCountdown();
+      const sttOK = startSTT();
+      let recOK = false;
+      try {
+        const res = await startRecording();
+        recOK = !!res;
+      } catch(e){ recOK = false; }
+      if(!sttOK){ alert('Không bật được nhận dạng giọng nói.'); stopAll(); }
+      // If recording failed, we still keep STT running
+    }
+
+    function stopAll(){
+      if(!listening) return;
+      listening = false;
+      stopCountdown();
+      stopSTT();
+      stopRecording();
+      startBtn.disabled = false; stopBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', startAll);
+    stopBtn.addEventListener('click', stopAll);
+    clearBtn.addEventListener('click', function(){ mySpeechBox.removeAttribute('data-final'); mySpeechBox.innerHTML = '<span class="muted">(nội dung bạn nói sẽ hiện ở đây)</span>'; });
+
+    secsInput.addEventListener('change', function(){ var v = parseInt(secsInput.value,10)||30; if(v<5) v=5; if(v>180) v=180; secsInput.value = v; setTimerDisplay(v); });
+
+    // Init
+    populateTopics();
+  </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+  if(!isSecure){
+    alert('⚠️ Trên điện thoại, để ghi âm và nhận dạng giọng nói hoạt động, bạn cần mở file này qua HTTPS hoặc localhost.\n\nVí dụ:\n- Dùng máy chủ local như Live Server\n- Hoặc upload lên hosting HTTPS');
+  }
+});
+</script>
+
+
+<script>
+function isIOS(){
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function isSafari(){
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
+async function startRecording(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('Không thể ghi âm (getUserMedia không khả dụng). Hãy mở qua HTTPS hoặc localhost.');
+    return false;
+  }
+  try {
+    const constraints = { audio: true }; // simpler for iOS
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    mediaStream = stream;
+    chunks = [];
+    let options = {};
+    if (typeof MediaRecorder === 'undefined') {
+      alert('Trình duyệt này không hỗ trợ MediaRecorder. Trên iOS, cần iOS 14.3+ hoặc dùng Chrome/Edge.');
+      return false;
+    }
+    let mime = '';
+    if (MediaRecorder.isTypeSupported('audio/webm')) { mime = 'audio/webm'; }
+    else if (MediaRecorder.isTypeSupported('audio/mp4')) { mime = 'audio/mp4'; }
+    else if (MediaRecorder.isTypeSupported('audio/mpeg')) { mime = 'audio/mpeg'; }
+    if (mime) options.mimeType = mime;
+    mediaRec = new MediaRecorder(stream, options);
+    mediaRec.ondataavailable = function(e){ if(e.data && e.data.size>0) chunks.push(e.data); };
+    mediaRec.onstop = function(){
+      try { stream.getTracks().forEach(t=>t.stop()); } catch(e){}
+      const blob = new Blob(chunks, { type: (mime || 'audio/webm') });
+      lastAudioURL = URL.createObjectURL(blob);
+      addRecordingToList(lastAudioURL, mySpeechBox.getAttribute('data-final') || '');
+      playLastBtn.disabled = !lastAudioURL;
+    };
+    mediaRec.start(100);
+    return true;
+  } catch(err){
+    console.warn('getUserMedia failed', err);
+    alert('Không thể truy cập micro. Trên iOS Safari, hãy bật quyền micro trong Cài đặt → Safari → Microphone.');
+    return false;
+  }
+}
+</script>
+
+</body>
+</html>
