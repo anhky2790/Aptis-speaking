@@ -37,6 +37,46 @@
 }
 
 </style>
+
+<style>
+/* old clock style removed */
+/* {
+  position: fixed !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(0,0,0,0.7) !important;
+  color: #fff !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  z-index: 10000 !important;
+  font-weight: bold;
+}
+body { padding-top: 40px; } /* ensure content not hidden behind clock */
+</style>
+
+
+<style>
+#timer, .timer {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  background: rgba(0,0,0,0.75) !important;
+  color: #fff !important;
+  padding: 8px 12px !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  z-index: 10000 !important;
+  backdrop-filter: saturate(120%) blur(6px);
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+  font-weight: 600;
+}
+/* Avoid content hidden under the fixed timer bar */
+body { padding-top: 48px !important; }
+</style>
+
 </head>
 <body>
   <h1>English Speaking Coach</h1>
@@ -261,19 +301,8 @@
         var spanFinal = document.createElement('span'); spanFinal.textContent = finalText; mySpeechBox.appendChild(spanFinal);
         if(interim){ var spanInter = document.createElement('span'); spanInter.style.opacity='0.6'; spanInter.textContent=' '+interim; mySpeechBox.appendChild(spanInter); }
       };
-      rec.onerror = function(ev){
-  // Don't kill recording when STT has an issue.
-  console.warn('SpeechRecognition error:', ev && ev.error);
-  try{ rec.stop(); }catch(e){}
-};
-rec.onend = function(){
-  // On mobile Safari, STT often ends after a short while.
-  // Keep the MediaRecorder running; optionally restart STT if we are still listening.
-  if(listening){
-    try{ rec.start(); }catch(e){ /* iOS may block auto-restart */ }
-  }
-};
-
+      rec.onerror = function(){ stopAll(); };
+      rec.onend = function(){ stopAll(); };
       rec.start();
       return true;
     }
@@ -317,7 +346,7 @@ rec.onend = function(){
         const res = await startRecording();
         recOK = !!res;
       } catch(e){ recOK = false; }
-      if(!sttOK){ console.warn('STT not available; continuing with recording only.'); }
+      if(!sttOK){ alert('Không bật được nhận dạng giọng nói.'); stopAll(); }
       // If recording failed, we still keep STT running
     }
 
@@ -364,7 +393,7 @@ async function startRecording(){
     return false;
   }
   try {
-    const constraints = { audio: { echoCancellation: true, noiseSuppression: true } }; // improved stability on mobile
+    const constraints = { audio: true }; // simpler for iOS
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     mediaStream = stream;
     chunks = [];
@@ -374,18 +403,10 @@ async function startRecording(){
       return false;
     }
     let mime = '';
-// Prefer MP4 on iOS Safari; WebM Opus elsewhere
-if (isIOS() && isSafari() && MediaRecorder.isTypeSupported('audio/mp4')) {
-  mime = 'audio/mp4';
-} else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-  mime = 'audio/webm;codecs=opus';
-} else if (MediaRecorder.isTypeSupported('audio/webm')) {
-  mime = 'audio/webm';
-} else if (MediaRecorder.isTypeSupported('audio/mpeg')) {
-  mime = 'audio/mpeg';
-}
-if (mime) options.mimeType = mime;
-
+    if (MediaRecorder.isTypeSupported('audio/webm')) { mime = 'audio/webm'; }
+    else if (MediaRecorder.isTypeSupported('audio/mp4')) { mime = 'audio/mp4'; }
+    else if (MediaRecorder.isTypeSupported('audio/mpeg')) { mime = 'audio/mpeg'; }
+    if (mime) options.mimeType = mime;
     mediaRec = new MediaRecorder(stream, options);
     mediaRec.ondataavailable = function(e){ if(e.data && e.data.size>0) chunks.push(e.data); };
     mediaRec.onstop = function(){
@@ -395,7 +416,7 @@ if (mime) options.mimeType = mime;
       addRecordingToList(lastAudioURL, mySpeechBox.getAttribute('data-final') || '');
       playLastBtn.disabled = !lastAudioURL;
     };
-    if (isIOS() && isSafari()) { mediaRec.start(); } else { mediaRec.start(1000); }
+    mediaRec.start(100);
     return true;
   } catch(err){
     console.warn('getUserMedia failed', err);
@@ -403,6 +424,118 @@ if (mime) options.mimeType = mime;
     return false;
   }
 }
+</script>
+
+
+<!-- Playback Speed Control -->
+<div id="playback-speed-panel" style="position:fixed; right:12px; bottom:12px; z-index:9999; background:#111827; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.25); font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;">
+  <label for="playbackSpeed" style="font-size:14px; margin-right:8px;">Tốc độ phát</label>
+  <select id="playbackSpeed" style="background:#1f2937; color:#fff; border:1px solid #374151; padding:6px 8px; border-radius:8px;">
+    <option value="0.75">0.75×</option>
+    <option value="1.0" selected>1.00×</option>
+    <option value="1.25">1.25×</option>
+    <option value="1.5">1.50×</option>
+    <option value="2.0">2.00×</option>
+  </select>
+</div>
+
+
+<script>
+  (function(){
+    // Global playback rate (default 1.0)
+    window.__playbackRate = 1.0;
+
+    function applyPlaybackRateToAll() {
+      document.querySelectorAll('audio').forEach(function(a){
+        try { a.playbackRate = window.__playbackRate; } catch(e){}
+      });
+    }
+
+    document.addEventListener('change', function(e){
+      if(e.target && e.target.id === 'playbackSpeed'){
+        window.__playbackRate = parseFloat(e.target.value) || 1.0;
+        applyPlaybackRateToAll();
+      }
+    }, true);
+
+    const _origPlay = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function(){
+      try { this.playbackRate = window.__playbackRate; } catch(e){}
+      return _origPlay.apply(this, arguments);
+    };
+
+    const observer = new MutationObserver(function(mutations){
+      let shouldApply = false;
+      mutations.forEach(m => {
+        if (m.addedNodes && m.addedNodes.length){
+          m.addedNodes.forEach(n => {
+            if (n.tagName && n.tagName.toLowerCase() === 'audio') shouldApply = true;
+            if (n.querySelectorAll){
+              if (n.querySelectorAll('audio').length) shouldApply = true;
+            }
+          });
+        }
+      });
+      if (shouldApply) applyPlaybackRateToAll();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    if (document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', applyPlaybackRateToAll);
+    } else {
+      applyPlaybackRateToAll();
+    }
+  })();
+</script>
+
+
+<script>
+  (function(){
+    // Apply selected speed to Web Speech API (TTS) and Web Audio API.
+    function currentRate(){ return (typeof window.__playbackRate === 'number' && window.__playbackRate > 0) ? window.__playbackRate : 1.0; }
+
+    // ----- Hook SpeechSynthesis.speak (TTS) -----
+    if (window.speechSynthesis && typeof window.speechSynthesis.speak === 'function') {
+      try {
+        const _origSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+        window.speechSynthesis.speak = function(utt){
+          try {
+            if (utt && typeof utt.rate === 'number') {
+              utt.rate = currentRate();
+            }
+          } catch(e){}
+          return _origSpeak(utt);
+        };
+      } catch(e){ /* ignore */ }
+    }
+
+    // Also adjust queued utterances when the rate changes
+    document.addEventListener('change', function(e){
+      if(e.target && e.target.id === 'playbackSpeed'){
+        try {
+          const q = (window.speechSynthesis && window.speechSynthesis.pending) ? window.speechSynthesis : null;
+          // Cannot directly rewrite queued items across browsers; best effort is to cancel and re-speak if app logic supports it.
+          // We leave this as a no-op here to avoid disrupting app flow.
+        } catch(_) {}
+      }
+    }, true);
+
+    // ----- Hook Web Audio API: AudioBufferSourceNode.start -----
+    try {
+      const proto = (window.AudioBufferSourceNode && window.AudioBufferSourceNode.prototype) ? window.AudioBufferSourceNode.prototype : null;
+      if (proto && typeof proto.start === 'function') {
+        const _origStart = proto.start;
+        proto.start = function(){
+          try {
+            if (this && this.playbackRate && typeof this.playbackRate.value === 'number') {
+              this.playbackRate.value = currentRate();
+            }
+          } catch(e){}
+          return _origStart.apply(this, arguments);
+        };
+      }
+    } catch(e){ /* ignore */ }
+  })();
 </script>
 
 </body>
