@@ -1,605 +1,231 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Speaking Coach</title>
-    <style>
-        /* CSS resets and base styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 700px;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        /* Typography */
-        h1 {
-            font-size: 2.2em;
-            color: #333;
-            text-align: center;
-            margin: 0;
-            font-weight: 600;
-        }
-        .subtitle {
-            font-size: 1em;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-        }
-        
-        /* Section styling */
-        .section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .section-heading {
-            font-size: 1.2em;
-            color: #555;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 8px;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        /* Form elements */
-        label {
-            font-weight: 600;
-            color: #444;
-            margin-bottom: 5px;
-        }
-        /* Increased font size for question and suggested answer textareas */
-        #question,
-        #suggestedAnswer {
-            font-size: 1.2em; /* Tăng cỡ chữ */
-            line-height: 1.6;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background-color: #f9f9f9;
-            min-height: 100px; /* Tăng chiều cao tối thiểu */
-            resize: vertical;
-        }
-        input[type="text"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background-color: #f9f9f9;
-        }
-        input[type="text"]:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-            outline: none;
-        }
-        textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        /* Buttons */
-        .controls, .player-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        button {
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Timer - fixed position */
-        .timer {
-            position: fixed; /* Keep timer visible on scroll */
-            top: 20px;
-            right: 20px;
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #ff4d4d;
-            background: #fff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            letter-spacing: 2px;
-            z-index: 1000; /* Ensure it's on top of other content */
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Settings */
-        .settings {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            align-items: center;
-        }
-        .settings-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .range-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            outline: none;
-            cursor: pointer;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #007bff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-        .range-value {
-            min-width: 30px;
-            text-align: right;
-            font-weight: 600;
-            color: #555;
-        }
-
-        /* Recordings list */
-        .recordings {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .recording-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .recording-item audio {
-            flex-grow: 1;
-        }
-        .recording-item a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .recording-item a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            .settings {
-                grid-template-columns: 1fr;
-            }
-            .controls button {
-                flex: 1 1 auto;
-                justify-content: center;
-            }
-            .timer {
-                font-size: 2em;
-                padding: 8px 12px;
-                top: 10px;
-                right: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>English Speaking Coach</title>
+  <style>
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f0f2f5;margin:0;padding:20px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
+    .container{width:100%;max-width:700px;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:25px}
+    h1{font-size:2.2em;color:#333;text-align:center;margin:0;font-weight:600}
+    .subtitle{font-size:1em;color:#666;text-align:center;margin-top:5px}
+    .section{display:flex;flex-direction:column;gap:15px}
+    .section-heading{font-size:1.2em;color:#555;border-bottom:2px solid #e0e0e0;padding-bottom:8px;margin-bottom:5px;font-weight:500}
+    label{font-weight:600;color:#444;margin-bottom:5px}
+    #question,#suggestedAnswer{font-size:1.2em;line-height:1.6;padding:15px;border:1px solid #ddd;border-radius:8px;transition:border-color .3s,box-shadow .3s;background-color:#f9f9f9;min-height:100px;resize:vertical}
+    input[type=text],textarea,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:1em;transition:border-color .3s,box-shadow .3s;background-color:#f9f9f9}
+    input[type=text]:focus,textarea:focus,select:focus{border-color:#007bff;box-shadow:0 0 0 3px rgba(0,123,255,.15);outline:none}
+    .controls,.player-controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    button{padding:12px 20px;background-color:#007bff;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;transition:background-color .3s,transform .2s;font-weight:600;display:flex;align-items:center;gap:8px}
+    button:hover{background-color:#0056b3;transform:translateY(-2px)}
+    button:disabled{background-color:#ccc;cursor:not-allowed;transform:none}
+    .timer{position:fixed;top:20px;right:20px;font-size:2.5em;font-weight:700;color:#ff4d4d;background:#fff;padding:10px 15px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,.1);letter-spacing:2px;z-index:1000}
+    .settings{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:center}
+    .settings-item{display:flex;flex-direction:column;gap:5px}
+    .range-container{display:flex;align-items:center;gap:10px}
+    input[type=range]{-webkit-appearance:none;width:100%;height:8px;background:#e0e0e0;border-radius:5px;outline:none;cursor:pointer}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#007bff;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 5px rgba(0,0,0,.2)}
+    .range-value{min-width:30px;text-align:right;font-weight:600;color:#555}
+    .recordings{display:flex;flex-direction:column;gap:15px}
+    .recording-item{display:flex;align-items:center;gap:15px;padding:10px;border:1px solid #eee;border-radius:8px;background-color:#fafafa}
+    .recording-item a{color:#007bff;text-decoration:none;font-weight:500}
+    .recording-item a:hover{text-decoration:underline}
+    @media (max-width:600px){.container{padding:20px}.settings{grid-template-columns:1fr}.controls button{flex:1 1 auto;justify-content:center}.timer{font-size:2em;padding:8px 12px;top:10px;right:10px}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>English Speaking Coach 🗣️</h1>
-        <p class="subtitle">Bản độc lập – Q&A, đếm ngược, ghi âm & phát lại, transcript trực tiếp</p>
+  <div class="container">
+    <h1>English Speaking Coach 🗣️</h1>
+    <p class="subtitle">Bản độc lập – Q&A, đếm ngược, ghi âm & phát lại, transcript trực tiếp</p>
 
-        <div class="section">
-            <h2 class="section-heading">Câu hỏi & Trả lời</h2>
-            
-            <label for="topicSelect">Chủ đề</label>
-            <select id="topicSelect"></select>
-            <button id="loadQuestion">Tải câu hỏi mới</button>
+    <div class="section">
+      <h2 class="section-heading">Câu hỏi & Trả lời</h2>
 
-            <label for="question">Câu hỏi</label>
-            <textarea id="question" readonly></textarea>
-            <div class="player-controls">
-                <button id="playQuestion">🔊 Phát câu hỏi</button>
-            </div>
+      <label for="topicSelect">Chủ đề</label>
+      <select id="topicSelect"></select>
 
-            <label for="suggestedAnswer">Gợi ý câu trả lời</label>
-            <textarea id="suggestedAnswer" readonly></textarea>
-            <div class="player-controls">
-                <button id="playSuggested">🔊 Phát gợi ý</button>
-            </div>
+      <label for="questionSelect">Câu hỏi</label>
+      <!-- ▼ Select để CHỌN câu hỏi, có mũi tên giống Chủ đề -->
+      <select id="questionSelect"></select>
+      <button id="loadQuestion">Tải câu hỏi ngẫu nhiên</button>
 
-            <p style="text-align: center; color: #888; font-style: italic;">
-                Mẹo: Bạn trả lời theo ý bạn, không cần đọc theo gợi ý.
-            </p>
-        </div>
+      <label for="question">Nội dung câu hỏi</label>
+      <textarea id="question" readonly></textarea>
+      <div class="player-controls">
+        <button id="playQuestion">🔊 Phát câu hỏi</button>
+      </div>
 
-        <div class="section">
-            <h2 class="section-heading">Phiên luyện tập của bạn</h2>
-            <div class="timer" id="timer">00:30</div>
-
-            <div class="controls">
-                <button id="startRecording">🎙️ Bắt đầu</button>
-                <button id="stopRecording" disabled>⏹ Dừng</button>
-                <button id="clearTranscript">🧹 Xóa transcript</button>
-                <button id="playLastRecording">⏯️ Phát bản ghi cuối</button>
-            </div>
-
-            <label for="transcript">Tôi nói (ghi theo thời gian thực)</label>
-            <textarea id="transcript" readonly></textarea>
-        </div>
-
-        <div class="section">
-            <h2 class="section-heading">Cài đặt phát âm</h2>
-            <div class="settings">
-                <div class="settings-item">
-                    <label for="voiceSelect">Giọng</label>
-                    <select id="voiceSelect"></select>
-                </div>
-                <div class="settings-item">
-                    <label for="rate">Tốc độ</label>
-                    <div class="range-container">
-                        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
-                        <span class="range-value" id="rateValue">1.0</span>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <label for="pitch">Cao độ</label>
-                    <div class="range-container">
-                        <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
-                        <span class="range-value" id="pitchValue">1.0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section recordings">
-            <h2 class="section-heading">Bản ghi gần đây</h2>
-            <p style="font-size: 0.9em; color: #888; margin-top: -10px;">
-                Lưu cục bộ trong phiên này. Bạn có thể tải về.
-            </p>
-            <div id="recordingList"></div>
-        </div>
+      <label for="suggestedAnswer">Gợi ý câu trả lời</label>
+      <textarea id="suggestedAnswer" readonly></textarea>
+      <div class="player-controls">
+        <button id="playSuggested">🔊 Phát gợi ý</button>
+      </div>
+      <p style="text-align:center;color:#888;font-style:italic">Mẹo: Bạn trả lời theo ý mình, không cần đọc theo gợi ý.</p>
     </div>
 
-    <script>
-        // Polyfills and compatibility checks
-        if (!('speechSynthesis' in window)) {
-            alert('Trình duyệt của bạn không hỗ trợ Speech Synthesis. Vui lòng sử dụng Chrome, Safari hoặc Edge.');
+    <div class="section">
+      <h2 class="section-heading">Phiên luyện tập của bạn</h2>
+      <div class="timer" id="timer">00:30</div>
+      <div class="controls">
+        <button id="startRecording">🎙️ Bắt đầu</button>
+        <button id="stopRecording" disabled>⏹ Dừng</button>
+        <button id="clearTranscript">🧹 Xóa transcript</button>
+        <button id="playLastRecording">⏯️ Phát bản ghi cuối</button>
+      </div>
+      <label for="transcript">Tôi nói (ghi theo thời gian thực)</label>
+      <textarea id="transcript" readonly></textarea>
+    </div>
+
+    <div class="section">
+      <h2 class="section-heading">Cài đặt phát âm</h2>
+      <div class="settings">
+        <div class="settings-item">
+          <label for="voiceSelect">Giọng</label>
+          <select id="voiceSelect"></select>
+        </div>
+        <div class="settings-item">
+          <label for="rate">Tốc độ</label>
+          <div class="range-container"><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"><span class="range-value" id="rateValue">1.0</span></div>
+        </div>
+        <div class="settings-item">
+          <label for="pitch">Cao độ</label>
+          <div class="range-container"><input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1"><span class="range-value" id="pitchValue">1.0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section recordings">
+      <h2 class="section-heading">Bản ghi gần đây</h2>
+      <p style="font-size:.9em;color:#888;margin-top:-10px">Lưu cục bộ trong phiên này. Bạn có thể tải về.</p>
+      <div id="recordingList"></div>
+    </div>
+  </div>
+
+  <script>
+    // ====== dữ liệu câu hỏi (GIỮ NGUYÊN NỘI DUNG CỦA BẠN) ======
+    const questionsData = {
+      "Giao tiếp hàng ngày": [
+        {question:"What did you do on your last holiday?",answer:"On my last holiday, I went to a beautiful beach with my family. We swam, built sandcastles, and ate a lot of fresh seafood. It was very relaxing and fun."},
+        {question:"How do you usually get to work or school?",answer:"I usually take the bus to work. It's convenient and helps me avoid traffic. Sometimes, I ride my bicycle if the weather is nice."},
+        {question:"What is your favorite hobby and why?",answer:"My favorite hobby is reading because it helps me relax and learn new things. I especially enjoy reading historical fiction."},
+        {question:"Tell me about a typical day in your life.",answer:"A typical day for me starts with waking up early to exercise, then I go to work. In the evening, I cook dinner and spend some time relaxing by watching a movie or reading a book before bed."},
+        {question:"What is your favorite type of food and why?",answer:"My favorite food is Vietnamese pho. I love the rich broth and fresh ingredients. It's a comforting and flavorful dish that reminds me of home."}
+      ],
+      "Kinh doanh & Công việc": [
+        {question:"Describe a challenge you faced at work and how you overcame it.",answer:"I once had a tight deadline on a project with an incomplete team. I organized a brief meeting, delegated tasks based on individual strengths, and worked extra hours to ensure we finished on time and the quality was high."},
+        {question:"What are your professional goals for the next five years?",answer:"My goal is to develop my skills in project management and take on more leadership responsibilities. I also plan to pursue a professional certification to advance my career in this field."},
+        {question:"How do you handle stress and pressure in the workplace?",answer:"I manage stress by prioritizing my tasks and focusing on one thing at a time. I also take short breaks to clear my mind and practice mindfulness to stay calm and focused."},
+        {question:"Describe a time you had to work with a difficult coworker.",answer:"I had a project with a coworker who had a different working style. Instead of getting frustrated, I initiated a conversation to understand their perspective. We found common ground and successfully completed the project by combining our strengths."},
+        {question:"What motivates you to do your best work?",answer:"I am motivated by a sense of accomplishment and the opportunity to learn new things. I also feel a strong drive to contribute to my team's success and help the company achieve its goals."}
+      ],
+      "Sở thích & Phong cách sống": [
+        {question:"Do you prefer listening to music or podcasts? Why?",answer:"I prefer listening to podcasts because they are a great way to learn new things while commuting or exercising. I'm especially interested in podcasts about technology and entrepreneurship."},
+        {question:"What kind of books do you enjoy reading?",answer:"I enjoy reading a variety of genres, but I'm most drawn to science fiction and fantasy. I love how these stories allow me to escape into different worlds and explore new ideas."},
+        {question:"How do you spend your weekends?",answer:"On the weekends, I like to relax and spend time with my family and friends. We often go hiking in the mountains or have a barbecue in the park. Sometimes I just stay home and catch up on my favorite TV shows."},
+        {question:"What is your favorite movie or TV show and why?",answer:"My favorite TV show is 'The Office'. I love the humor and the witty dialogues. It's a feel-good show that always makes me laugh and helps me unwind after a long day."},
+        {question:"If you could travel anywhere in the world, where would you go and why?",answer:"I would travel to Japan. I am fascinated by its rich culture, beautiful temples, and delicious food. I would love to experience the cherry blossom season and explore the bustling streets of Tokyo."}
+      ]
+    };
+
+    // ====== KHỞI TẠO UI ======
+    function populateUI(){
+      const topicSelect=document.getElementById('topicSelect');
+      topicSelect.innerHTML='';
+      Object.keys(questionsData).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;topicSelect.appendChild(o)});
+      topicSelect.addEventListener('change',()=>{buildQuestionSelect();applySelectedQuestion()});
+      document.getElementById('questionSelect').addEventListener('change',applySelectedQuestion);
+      document.getElementById('loadQuestion').addEventListener('click',loadRandomQuestion);
+      // Lần đầu
+      buildQuestionSelect();
+      applySelectedQuestion();
+    }
+
+    // Tạo danh sách <option> cho select câu hỏi (có mũi tên)
+    function buildQuestionSelect(){
+      const topic=document.getElementById('topicSelect').value;
+      const qs=questionsData[topic]||[];
+      const sel=document.getElementById('questionSelect');
+      sel.innerHTML='';
+      qs.forEach((item,idx)=>{const op=document.createElement('option');op.value=String(idx);op.textContent=`${idx+1}. ${item.question}`;sel.appendChild(op)});
+      // Giữ chọn phần tử đầu nếu tồn tại
+      if(qs.length>0) sel.value='0';
+    }
+
+    // Áp dụng câu hỏi theo option đang chọn
+    function applySelectedQuestion(){
+      const topic=document.getElementById('topicSelect').value;
+      const qs=questionsData[topic]||[];
+      const selIdx=parseInt(document.getElementById('questionSelect').value||'0',10)||0;
+      const item=qs[Math.min(Math.max(selIdx,0),Math.max(qs.length-1,0))];
+      if(!item) return;
+      document.getElementById('question').value=item.question;
+      document.getElementById('suggestedAnswer').value=item.answer;
+    }
+
+    // Lấy ngẫu nhiên nhưng vẫn cập nhật select để đồng bộ
+    function loadRandomQuestion(){
+      const topic=document.getElementById('topicSelect').value;
+      const qs=questionsData[topic]||[];
+      if(!qs.length) return;
+      const idx=Math.floor(Math.random()*qs.length);
+      document.getElementById('questionSelect').value=String(idx);
+      applySelectedQuestion();
+    }
+
+    document.addEventListener('DOMContentLoaded', populateUI);
+
+    // ====== TTS ======
+    const synth=window.speechSynthesis; let voices=[];
+    function populateVoiceList(){
+      voices=synth.getVoices();
+      const voiceSelect=document.getElementById('voiceSelect');
+      voiceSelect.innerHTML='';
+      voices.forEach(v=>{if(v.lang.startsWith('en')){const op=document.createElement('option');op.value=v.name;op.textContent=`${v.name} (${v.lang})`;voiceSelect.appendChild(op);}});
+      const def=voices.find(v=>v.lang==='en-US'); if(def) voiceSelect.value=def.name;
+    }
+    populateVoiceList(); if(synth.onvoiceschanged!==undefined) synth.onvoiceschanged=populateVoiceList;
+    document.getElementById('rate').addEventListener('input',e=>document.getElementById('rateValue').textContent=e.target.value);
+    document.getElementById('pitch').addEventListener('input',e=>document.getElementById('pitchValue').textContent=e.target.value);
+    function speak(text){const u=new SpeechSynthesisUtterance(text);const sel=document.getElementById('voiceSelect').value;const v=voices.find(v=>v.name===sel);if(v)u.voice=v;u.rate=parseFloat(document.getElementById('rate').value);u.pitch=parseFloat(document.getElementById('pitch').value);synth.speak(u);}
+    document.getElementById('playQuestion').addEventListener('click',()=>speak(document.getElementById('question').value));
+    document.getElementById('playSuggested').addEventListener('click',()=>speak(document.getElementById('suggestedAnswer').value));
+
+    // ====== Ghi âm + transcript (giữ nguyên logic cũ) ======
+    let recognition; let mediaRecorder; let audioChunks=[]; let recordings=[]; let currentAudio=null; let timerInterval; let timeLeft=30; const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+    document.getElementById('startRecording').addEventListener('click', async()=>{
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        mediaRecorder=new MediaRecorder(stream); audioChunks=[];
+        mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+        mediaRecorder.onstop=()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});recordings.push(blob);updateRecordingList();};
+        mediaRecorder.start();
+        document.getElementById('startRecording').disabled=true;document.getElementById('stopRecording').disabled=false;
+        timeLeft=30; document.getElementById('timer').textContent='00:30'; timerInterval=setInterval(updateTimer,1000);
+        if(SpeechRecognition){
+          recognition=new SpeechRecognition(); recognition.lang='en-US'; recognition.interimResults=true;
+          recognition.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join(''); document.getElementById('transcript').value=t;};
+          recognition.onerror=e=>console.error('Speech recognition error',e);
+          recognition.start();
         }
-        if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-            alert('Trình duyệt của bạn không hỗ trợ Speech Recognition. Vui lòng sử dụng Chrome hoặc Safari.');
-        }
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('Trình duyệt của bạn không hỗ trợ ghi âm. Vui lòng kiểm tra quyền truy cập microphone.');
-        }
+      }catch(err){console.error('Error accessing microphone',err); alert('Không thể truy cập microphone. Vui lòng kiểm tra quyền và thử lại.');}
+    });
 
-        // Global variables
-        let recognition;
-        let mediaRecorder;
-        let audioChunks = [];
-        let recordings = [];
-        let currentAudio = null;
-        let timerInterval;
-        let timeLeft = 30;
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    document.getElementById('stopRecording').addEventListener('click',()=>{
+      if(mediaRecorder&&mediaRecorder.state!=='inactive') mediaRecorder.stop();
+      if(recognition) recognition.stop();
+      clearInterval(timerInterval);
+      document.getElementById('startRecording').disabled=false;document.getElementById('stopRecording').disabled=true;
+    });
 
-        // Data Questions
-        const questionsData = {
-            "Giao tiếp hàng ngày": [
-                {
-                    question: "What did you do on your last holiday?",
-                    answer: "On my last holiday, I went to a beautiful beach with my family. We swam, built sandcastles, and ate a lot of fresh seafood. It was very relaxing and fun."
-                },
-                {
-                    question: "How do you usually get to work or school?",
-                    answer: "I usually take the bus to work. It's convenient and helps me avoid traffic. Sometimes, I ride my bicycle if the weather is nice."
-                },
-                {
-                    question: "What is your favorite hobby and why?",
-                    answer: "My favorite hobby is reading because it helps me relax and learn new things. I especially enjoy reading historical fiction."
-                },
-                {
-                    question: "Tell me about a typical day in your life.",
-                    answer: "A typical day for me starts with waking up early to exercise, then I go to work. In the evening, I cook dinner and spend some time relaxing by watching a movie or reading a book before bed."
-                },
-                {
-                    question: "What is your favorite type of food and why?",
-                    answer: "My favorite food is Vietnamese pho. I love the rich broth and fresh ingredients. It's a comforting and flavorful dish that reminds me of home."
-                }
-            ],
-            "Kinh doanh & Công việc": [
-                {
-                    question: "Describe a challenge you faced at work and how you overcame it.",
-                    answer: "I once had a tight deadline on a project with an incomplete team. I organized a brief meeting, delegated tasks based on individual strengths, and worked extra hours to ensure we finished on time and the quality was high."
-                },
-                {
-                    question: "What are your professional goals for the next five years?",
-                    answer: "My goal is to develop my skills in project management and take on more leadership responsibilities. I also plan to pursue a professional certification to advance my career in this field."
-                },
-                {
-                    question: "How do you handle stress and pressure in the workplace?",
-                    answer: "I manage stress by prioritizing my tasks and focusing on one thing at a time. I also take short breaks to clear my mind and practice mindfulness to stay calm and focused."
-                },
-                {
-                    question: "Describe a time you had to work with a difficult coworker.",
-                    answer: "I had a project with a coworker who had a different working style. Instead of getting frustrated, I initiated a conversation to understand their perspective. We found common ground and successfully completed the project by combining our strengths."
-                },
-                {
-                    question: "What motivates you to do your best work?",
-                    answer: "I am motivated by a sense of accomplishment and the opportunity to learn new things. I also feel a strong drive to contribute to my team's success and help the company achieve its goals."
-                }
-            ],
-            "Sở thích & Phong cách sống": [
-                {
-                    question: "Do you prefer listening to music or podcasts? Why?",
-                    answer: "I prefer listening to podcasts because they are a great way to learn new things while commuting or exercising. I'm especially interested in podcasts about technology and entrepreneurship."
-                },
-                {
-                    question: "What kind of books do you enjoy reading?",
-                    answer: "I enjoy reading a variety of genres, but I'm most drawn to science fiction and fantasy. I love how these stories allow me to escape into different worlds and explore new ideas."
-                },
-                {
-                    question: "How do you spend your weekends?",
-                    answer: "On the weekends, I like to relax and spend time with my family and friends. We often go hiking in the mountains or have a barbecue in the park. Sometimes I just stay home and catch up on my favorite TV shows."
-                },
-                {
-                    question: "What is your favorite movie or TV show and why?",
-                    answer: "My favorite TV show is 'The Office'. I love the humor and the witty dialogues. It's a feel-good show that always makes me laugh and helps me unwind after a long day."
-                },
-                {
-                    question: "If you could travel anywhere in the world, where would you go and why?",
-                    answer: "I would travel to Japan. I am fascinated by its rich culture, beautiful temples, and delicious food. I would love to experience the cherry blossom season and explore the bustling streets of Tokyo."
-                }
-            ]
-        };
+    document.getElementById('clearTranscript').addEventListener('click',()=>document.getElementById('transcript').value='');
+    document.getElementById('playLastRecording').addEventListener('click',()=>{
+      if(recordings.length>0){const last=recordings[recordings.length-1]; if(currentAudio) currentAudio.pause(); currentAudio=new Audio(URL.createObjectURL(last)); currentAudio.play();} else {alert('Chưa có bản ghi nào.');}
+    });
 
-        // Initialize UI
-        function populateUI() {
-            // Populate Topics
-            const topicSelect = document.getElementById('topicSelect');
-            for (const topic in questionsData) {
-                const option = document.createElement('option');
-                option.textContent = topic;
-                option.value = topic;
-                topicSelect.appendChild(option);
-            }
-            loadRandomQuestion();
-        }
+    function updateTimer(){ timeLeft--; document.getElementById('timer').textContent=`00:${timeLeft.toString().padStart(2,'0')}`; if(timeLeft<=0 && !document.getElementById('stopRecording').disabled){ document.getElementById('stopRecording').click(); } }
 
-        function loadRandomQuestion() {
-            const topicSelect = document.getElementById('topicSelect');
-            const currentTopic = topicSelect.value;
-            const questions = questionsData[currentTopic];
-            if (questions && questions.length > 0) {
-                const randomIndex = Math.floor(Math.random() * questions.length);
-                const questionObj = questions[randomIndex];
-                document.getElementById('question').value = questionObj.question;
-                document.getElementById('suggestedAnswer').value = questionObj.answer;
-            }
-        }
-        
-        document.getElementById('topicSelect').addEventListener('change', loadRandomQuestion);
-        document.getElementById('loadQuestion').addEventListener('click', loadRandomQuestion);
-        
-        // Initialize Speech Synthesis
-        const synth = window.speechSynthesis;
-        let voices = [];
-        function populateVoiceList() {
-            voices = synth.getVoices();
-            const voiceSelect = document.getElementById('voiceSelect');
-            voiceSelect.innerHTML = '';
-            voices.forEach(voice => {
-                if (voice.lang.startsWith('en')) {
-                    const option = document.createElement('option');
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    option.value = voice.name;
-                    voiceSelect.appendChild(option);
-                }
-            });
-            const defaultVoice = voices.find(v => v.lang === 'en-US');
-            if (defaultVoice) {
-                voiceSelect.value = defaultVoice.name;
-            }
-        }
-        populateVoiceList();
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = populateVoiceList;
-        }
-
-        // Update rate and pitch values
-        document.getElementById('rate').addEventListener('input', e => {
-            document.getElementById('rateValue').textContent = e.target.value;
-        });
-        document.getElementById('pitch').addEventListener('input', e => {
-            document.getElementById('pitchValue').textContent = e.target.value;
-        });
-
-        // Play Question
-        document.getElementById('playQuestion').addEventListener('click', () => {
-            const text = document.getElementById('question').value;
-            speak(text);
-        });
-
-        // Play Suggested Answer
-        document.getElementById('playSuggested').addEventListener('click', () => {
-            const text = document.getElementById('suggestedAnswer').value;
-            speak(text);
-        });
-
-        // Speak function with settings
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            const selectedVoice = document.getElementById('voiceSelect').value;
-            const voice = voices.find(v => v.name === selectedVoice);
-            if (voice) utterance.voice = voice;
-            utterance.rate = parseFloat(document.getElementById('rate').value);
-            utterance.pitch = parseFloat(document.getElementById('pitch').value);
-            synth.speak(utterance);
-        }
-
-        // Start Recording
-        document.getElementById('startRecording').addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    recordings.push(blob);
-                    updateRecordingList();
-                };
-
-                mediaRecorder.start();
-                document.getElementById('startRecording').disabled = true;
-                document.getElementById('stopRecording').disabled = false;
-
-                // Start timer countdown
-                timeLeft = 30;
-                document.getElementById('timer').textContent = '00:30';
-                timerInterval = setInterval(updateTimer, 1000);
-
-                // Start speech recognition
-                if (SpeechRecognition) {
-                    recognition = new SpeechRecognition();
-                    recognition.lang = 'en-US';
-                    recognition.interimResults = true;
-                    recognition.onresult = event => {
-                        const transcript = Array.from(event.results)
-                            .map(result => result[0].transcript)
-                            .join('');
-                        document.getElementById('transcript').value = transcript;
-                    };
-                    recognition.onerror = event => console.error('Speech recognition error', event);
-                    recognition.start();
-                }
-            } catch (err) {
-                console.error('Error accessing microphone', err);
-                alert('Không thể truy cập microphone. Vui lòng kiểm tra quyền và thử lại.');
-            }
-        });
-
-        // Stop Recording
-        document.getElementById('stopRecording').addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-            }
-            if (recognition) recognition.stop();
-            clearInterval(timerInterval);
-            document.getElementById('startRecording').disabled = false;
-            document.getElementById('stopRecording').disabled = true;
-        });
-
-        // Clear Transcript
-        document.getElementById('clearTranscript').addEventListener('click', () => {
-            document.getElementById('transcript').value = '';
-        });
-
-        // Play Last Recording
-        document.getElementById('playLastRecording').addEventListener('click', () => {
-            if (recordings.length > 0) {
-                const lastRecording = recordings[recordings.length - 1];
-                if (currentAudio) currentAudio.pause();
-                currentAudio = new Audio(URL.createObjectURL(lastRecording));
-                currentAudio.play();
-            } else {
-                alert('Chưa có bản ghi nào.');
-            }
-        });
-
-        // Update Timer
-        function updateTimer() {
-            timeLeft--;
-            document.getElementById('timer').textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
-            if (timeLeft <= 0) {
-                if (document.getElementById('stopRecording').disabled === false) {
-                    document.getElementById('stopRecording').click();
-                }
-            }
-        }
-
-        // Update Recording List
-        function updateRecordingList() {
-            const list = document.getElementById('recordingList');
-            list.innerHTML = '';
-            recordings.forEach((blob, index) => {
-                const div = document.createElement('div');
-                div.className = 'recording-item';
-                const audio = document.createElement('audio');
-                audio.controls = true;
-                audio.src = URL.createObjectURL(blob);
-                const download = document.createElement('a');
-                download.href = audio.src;
-                download.download = `recording_${index + 1}.webm`;
-                download.textContent = 'Tải về';
-                div.appendChild(audio);
-                div.appendChild(download);
-                list.appendChild(div);
-            });
-        }
-        
-        document.addEventListener('DOMContentLoaded', populateUI);
-    </script>
+    function updateRecordingList(){ const list=document.getElementById('recordingList'); list.innerHTML=''; recordings.forEach((blob,i)=>{const div=document.createElement('div'); div.className='recording-item'; const audio=document.createElement('audio'); audio.controls=true; audio.src=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=audio.src; a.download=`recording_${i+1}.webm`; a.textContent='Tải về'; div.appendChild(audio); div.appendChild(a); list.appendChild(div); }); }
+  </script>
 </body>
 </html>
