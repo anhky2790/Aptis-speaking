@@ -36,7 +36,7 @@
 <body>
   <div class="container">
     <h1>English Speaking Coach 🗣️</h1>
-    <p class="subtitle">Bản độc lập – Q&A, đếm ngược, ghi âm & phát lại, transcript trực tiếp</p>
+    <p class="subtitle"> APTIS SPEAKING PART 1: Q&A, đếm ngược, ghi âm & phát lại, transcript trực tiếp</p>
 
     <div class="section">
       <h2 class="section-heading">Câu hỏi & Trả lời</h2>
@@ -104,27 +104,177 @@
   <script>
     // ====== dữ liệu câu hỏi (GIỮ NGUYÊN NỘI DUNG CỦA BẠN) ======
     const questionsData = {
-      "Giao tiếp hàng ngày": [
-        {question:"What did you do on your last holiday?",answer:"On my last holiday, I went to a beautiful beach with my family. We swam, built sandcastles, and ate a lot of fresh seafood. It was very relaxing and fun."},
-        {question:"How do you usually get to work or school?",answer:"I usually take the bus to work. It's convenient and helps me avoid traffic. Sometimes, I ride my bicycle if the weather is nice."},
-        {question:"What is your favorite hobby and why?",answer:"My favorite hobby is reading because it helps me relax and learn new things. I especially enjoy reading historical fiction."},
-        {question:"Tell me about a typical day in your life.",answer:"A typical day for me starts with waking up early to exercise, then I go to work. In the evening, I cook dinner and spend some time relaxing by watching a movie or reading a book before bed."},
-        {question:"What is your favorite type of food and why?",answer:"My favorite food is Vietnamese pho. I love the rich broth and fresh ingredients. It's a comforting and flavorful dish that reminds me of home."}
-      ],
-      "Kinh doanh & Công việc": [
-        {question:"Describe a challenge you faced at work and how you overcame it.",answer:"I once had a tight deadline on a project with an incomplete team. I organized a brief meeting, delegated tasks based on individual strengths, and worked extra hours to ensure we finished on time and the quality was high."},
-        {question:"What are your professional goals for the next five years?",answer:"My goal is to develop my skills in project management and take on more leadership responsibilities. I also plan to pursue a professional certification to advance my career in this field."},
-        {question:"How do you handle stress and pressure in the workplace?",answer:"I manage stress by prioritizing my tasks and focusing on one thing at a time. I also take short breaks to clear my mind and practice mindfulness to stay calm and focused."},
-        {question:"Describe a time you had to work with a difficult coworker.",answer:"I had a project with a coworker who had a different working style. Instead of getting frustrated, I initiated a conversation to understand their perspective. We found common ground and successfully completed the project by combining our strengths."},
-        {question:"What motivates you to do your best work?",answer:"I am motivated by a sense of accomplishment and the opportunity to learn new things. I also feel a strong drive to contribute to my team's success and help the company achieve its goals."}
-      ],
-      "Sở thích & Phong cách sống": [
-        {question:"Do you prefer listening to music or podcasts? Why?",answer:"I prefer listening to podcasts because they are a great way to learn new things while commuting or exercising. I'm especially interested in podcasts about technology and entrepreneurship."},
-        {question:"What kind of books do you enjoy reading?",answer:"I enjoy reading a variety of genres, but I'm most drawn to science fiction and fantasy. I love how these stories allow me to escape into different worlds and explore new ideas."},
-        {question:"How do you spend your weekends?",answer:"On the weekends, I like to relax and spend time with my family and friends. We often go hiking in the mountains or have a barbecue in the park. Sometimes I just stay home and catch up on my favorite TV shows."},
-        {question:"What is your favorite movie or TV show and why?",answer:"My favorite TV show is 'The Office'. I love the humor and the witty dialogues. It's a feel-good show that always makes me laugh and helps me unwind after a long day."},
-        {question:"If you could travel anywhere in the world, where would you go and why?",answer:"I would travel to Japan. I am fascinated by its rich culture, beautiful temples, and delicious food. I would love to experience the cherry blossom season and explore the bustling streets of Tokyo."}
-      ]
+      "ACTIVITY/HOBBY": 
+	  [   
+  {
+    "question": "Please describe your typical day.",
+    "answer": "I usually start my day by listening to music because it helps me relax and feel happy. Moreover, I spend time reading books because it helps me learn new things and improve my vocabulary. Furthermore, I often go shopping because it helps me buy fresh food and clothes for my family."
+  },
+  {
+    "question": "Describe something you are planning to do in the future.",
+    "answer": "I am planning to study English in the future because it will help me communicate with foreigners and get a good job. Moreover, I want to study Chinese because it will help me understand Chinese culture and do business. Furthermore, I would like to work for a famous company because it will give me experience and a high salary."
+  },
+  {
+    "question": "Tell me about your today.",
+    "answer": "Today I listened to music and read books all day. I like listening to music because it makes me relaxed after studying. Moreover, I enjoy reading books because it gives me more knowledge. Furthermore, I like playing computer games because it helps me have fun and reduce stress."
+  },
+  {
+    "question": "What’s your favorite color?",
+    "answer": "I like red because it makes me feel energetic and confident. Moreover, I like blue because it helps me feel calm and peaceful. Furthermore, I like green because it makes me feel fresh and close to nature."
+  },
+  {
+    "question": "Please tell me about your favorite book.",
+    "answer": "My favorite book is by Nguyen Nhat Anh. I like reading this book because it tells touching and meaningful stories. Moreover, I enjoy reading novels because they help me imagine different worlds. Furthermore, I like reading comic books because they are funny and relaxing."
+  },
+  {
+    "question": "What types of books do people like to read?",
+    "answer": "I think people like reading novels and comic books because they are entertaining and relaxing. For me, I like reading books because they help me learn more knowledge. Moreover, I like reading novels because they improve my imagination. Furthermore, I like reading comic books because they make me laugh."
+  },
+  {
+    "question": "Which kind of sports do people in your country like most?",
+    "answer": "People in my country like football most because it helps them stay healthy and have fun. Sometimes they also like playing table tennis because it helps them relax and improve their reflexes."
+  },
+  {
+    "question": "Which kind of sports do you like most?",
+    "answer": "For me, I like playing football because it helps me exercise and make friends. Moreover, I also like playing table tennis because it improves my reflexes and concentration."
+  },
+  {
+    "question": "What are you going to do for the rest of today?",
+    "answer": "I think I will study English for the rest of today because it helps me improve my communication skills. Moreover, I will listen to music in the evening because it helps me relax after studying."
+  },
+  {
+    "question": "What did you do yesterday?",
+    "answer": "I played computer games yesterday because they help me have fun. Moreover, I read books yesterday because they help me learn more. Furthermore, I went shopping yesterday because it helps me buy the things I need."
+  },
+  {
+    "question": "How do you like to spend your holidays or vacations?",
+    "answer": "I like listening to music on my holidays because it helps me relax. Moreover, I like reading books because it helps me learn more knowledge. Furthermore, I like going shopping because it helps me buy nice clothes. In addition, I like travelling to Hanoi because it helps me explore new places."
+  },
+  {
+    "question": "How often do you watch TV?",
+    "answer": "I watch TV every day in the evening because it helps me relax. Moreover, I like watching TV with my friends because we can share funny moments. Furthermore, I like watching TV with my family because it helps us spend time together."
+  },
+  {
+    "question": "What do you like to do with your friends?",
+    "answer": "I like watching TV with my friends because we can talk about the shows. Moreover, I like going shopping with my friends because we can choose clothes together. Furthermore, I like playing football with my friends because it is fun and healthy."
+  }
+  ],
+  
+  "OTHER question": 
+  [
+  {
+    "question": "Tell me about the last lesson in class.",
+    "answer": "The last lesson in my class was last week. I studied English with my classmates. We learnt listening, reading, speaking, and writing. I like learning English because it helps me communicate with people around the world. Moreover, I like learning science because it helps me understand how things work. Furthermore, I like learning math because it helps me solve problems quickly."
+  },
+  {
+    "question": "Describe a typical meal in your country.",
+    "answer": "People in my country often have three meals a day with their family. I like having meals with my family because it helps us talk and share stories. Moreover, I like having meals with my friends because it is fun and relaxing. Furthermore, I like having meals with my girlfriend/boyfriend because it is romantic. In addition, I like having meals at restaurants because I can try new dishes."
+  },
+  {
+    "question": "What is the special meal in your country?",
+    "answer": "My country has many special meals. We often have special meals during Tet holiday, birthday parties, and wedding parties. I like having special meals because they make me happy. Moreover, I like eating Banh Chung during Tet because it is delicious and traditional. Furthermore, I like having special meals at birthday or wedding parties because they are joyful."
+  },
+  {
+    "question": "Tell me about yourself and what you are looking for in your new house.",
+    "answer": "I am a student now and I am very busy. I study English all day. I like studying English because it helps me get a good job. I am looking for a big house with a big living room, a big kitchen, a big bedroom, and a big garden. I like a big house because it is comfortable and beautiful."
+  },
+  {
+    "question": "What is your occupation / job / career?",
+    "answer": "I am a student now and I am very busy. I have to study English all day. I like studying English because it helps me improve my skills. I also like listening to music because it helps me relax. Moreover, I like reading books because it gives me more knowledge. Furthermore, I like going shopping because it is fun."
+  },
+  {
+    "question": "What are you wearing today?",
+    "answer": "I am wearing a T-shirt and jeans today. I like wearing a T-shirt because it is comfortable. Moreover, I like wearing jeans because they are easy to match with clothes."
+  },
+  {
+    "question": "What is the importance of sleep?",
+    "answer": "Sleep is important because it helps us stay healthy and feel fresh. I like sleeping because it gives me energy for the next day. Moreover, I like reading books before sleeping because it helps me relax. Furthermore, I like listening to music before sleeping because it makes me sleep better."
+  },
+  {
+    "question": "How’s the weather today?",
+    "answer": "The weather is very hot today, and I am reading a book. I like travelling to Hanoi because it helps me explore new places. Moreover, I like reading books because they improve my knowledge. Furthermore, I like listening to music because it makes me feel relaxed."
+  },
+  {
+    "question": "Tell me why you are learning English.",
+    "answer": "I like learning English because it helps me travel and work anywhere in the world. Moreover, I also like learning Chinese because it helps me understand Chinese culture. Furthermore, I also like learning Japanese because it helps me connect with Japanese friends."
+  },
+  {
+    "question": "When do you feel tired?",
+    "answer": "I am a student now, and I feel tired when I have to study English a lot. However, I like studying English because it improves my communication. Moreover, I also like learning Chinese because it is interesting. Furthermore, I also like learning Japanese because it is useful."
+  },
+  {
+    "question": "Please tell me about one of your good memories.",
+    "answer": "Last year, I visited Sapa with my love. Sapa is really beautiful and has many great views. This is one of my good memories. I really like travelling to Sapa because it helps me relax and enjoy nature. I really like visiting Sapa with my friends because we have fun together."
+  }
+],
+  
+   "PERSON": 
+  [
+    {
+    "question": "Please tell me about your best friend.",
+    "answer": "My best friend is Nguyen Hoang Thanh. He is 20 years old and really handsome. We like listening to music together because it makes us relaxed. Moreover, we like reading books together because it helps us learn more. Furthermore, we like watching films together because it is fun and entertaining."
+  },
+  {
+    "question": "Tell me about your family.",
+    "answer": "There are four people in my family: my parents, my brother, and me. We like listening to music together because it helps us feel happy. Moreover, we like reading books together because it helps us gain more knowledge. Furthermore, we like watching films together because it helps us spend time together."
+  },
+  {
+    "question": "Please tell me about your favorite film star / singer.",
+    "answer": "My favorite singer is Gia Bao. She is beautiful and really famous in Vietnam. I really like listening to her songs because they are emotional and inspiring. Moreover, I like watching her music videos because they are creative and beautiful."
+  },
+  {
+    "question": "Tell me about a movie you watched.",
+    "answer": "The movie I watched was “Mai”. This film is really interesting and nice. I like watching the film “Mai” at the cinema because the sound and picture are amazing. Moreover, I like watching the film “Mai” with my friends because we can talk about it after. Furthermore, I like watching the film “Mai” with my family because it helps us relax together."
+  },
+  {
+    "question": "Tell me the last thing you saw on TV last night.",
+    "answer": "The last thing I saw on TV last night was the film “Mai”. This film is really interesting and nice. I like watching the film “Mai” at the cinema because it feels more exciting. Moreover, I like watching the film “Mai” with my friends because it is more fun. Furthermore, I like watching the film “Mai” with my family because it helps us enjoy time together."
+  },
+  {
+    "question": "Tell me about a time you watched a film.",
+    "answer": "Last week I went to Thai Nguyen cinema to watch the film “Dao, Pho and Piano”. This film is really interesting and nice. I like watching films at the cinema because the screen is big and the sound is great. Moreover, I like watching films with my friends at the cinema because we have fun together. Furthermore, I like watching films with my family at the cinema because it makes us happy."
+  },
+  {
+    "question": "Tell me about the last time you went to the cinema.",
+    "answer": "The last time I went to the cinema was last week. I went there to watch the film “Mai”. This film is really interesting and nice. I like watching the film “Mai” at the cinema because the atmosphere is exciting. Moreover, I like watching the film “Mai” with my friends because it is more enjoyable. Furthermore, I like watching the film “Mai” with my family because it is a nice family activity."
+  }
+  ],
+  
+  "PLACES/CITY": 
+  [     
+  {
+    "question": "Please tell me about a famous place in your country.",
+    "answer": "Hanoi is a famous place in my country. People in Hanoi are friendly and nice. I like visiting Hanoi because it helps me learn about Vietnamese history and culture. Moreover, I like visiting Danang because it has beautiful beaches and fresh air. Furthermore, I like visiting Ho Chi Minh City because it is modern and exciting."
+  },
+  {
+    "question": "Tell me about your favorite place.",
+    "answer": "My favorite place is Hanoi. People in Hanoi are friendly and nice. I like visiting Hanoi because it helps me enjoy delicious food and historical sites. Moreover, I like visiting Danang because it is peaceful and has beautiful beaches. Furthermore, I like visiting Ho Chi Minh City because it has many interesting places to explore."
+  },
+  {
+    "question": "Describe the place where you live / Tell me about your hometown or city.",
+    "answer": "I live in Hanoi. People in Hanoi are friendly and nice. I like living in Hanoi because it has many cultural activities and good food. Moreover, I like living in Danang because it is quiet and clean. Furthermore, I like living in Ho Chi Minh City because it has many job opportunities."
+  },
+  {
+    "question": "Tell me about your last holiday.",
+    "answer": "Last summer, I visited Hanoi, a famous place in my country. People in Hanoi are friendly and nice. I like visiting Hanoi because it has many interesting museums. Moreover, I like visiting Danang because it is relaxing and beautiful. Furthermore, I like visiting Ho Chi Minh City because it has many shopping centers."
+  },
+  {
+    "question": "Please tell me the best way to travel around your country.",
+    "answer": "The best way to travel around my country is by car. I like travelling by car because it is comfortable and fast. Moreover, I like travelling by bike because it is cheap and healthy. Furthermore, I like travelling by bus because it is safe and affordable."
+  },
+  {
+    "question": "Please describe your journey here today.",
+    "answer": "I am travelling to Danang, which is really famous. People in Danang are friendly and nice. I came here by bike. I like travelling to Danang by bike because it is fun and I can enjoy the scenery. Moreover, I like travelling to Danang by car because it is comfortable. Furthermore, I like travelling to Danang by bus because it is safe and cheap."
+  },
+  {
+    "question": "Tell me about your first school.",
+    "answer": "My first school is Chu Van An. There were many students and teachers in my school in the past and now. I like visiting my first school in my free time because it brings back good memories. Moreover, I like visiting my friends at my first school because we can talk about old times. Furthermore, I like visiting my teachers at my first school because they taught me a lot."
+  },
+  {
+    "question": "Describe this room / Describe the room you are in.",
+    "answer": "I am staying in the living room of my house. There is a TV and a big table in my living room. I like listening to music in my living room because it helps me relax. Moreover, I like reading books in my living room because it is quiet. Furthermore, I like watching films in my living room because it is comfortable."
+  }
+  ]
     };
 
     // ====== KHỞI TẠO UI ======
